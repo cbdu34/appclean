@@ -1,132 +1,73 @@
-import os
-import shutil
-import tkinter as tk
-from tkinter import filedialog, messagebox
-from pathlib import Path
+# 🧹 AppClean
 
-# --- CONFIGURATION ---
-CLASSEMENT = {
-    "Images": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp"],
-    "Scripts_Python": [".py", ".pyw", ".ipynb"],
-    "LibreOffice_Docs": [".odt", ".ott", ".sxw", ".ods", ".odp"],
-    "PDF_et_Textes": [".pdf", ".txt", ".doc", ".docx"],
-    "Videos": [".mp4", ".mov", ".avi", ".mkv"],
-    "Musique": [".mp3", ".wav", ".flac"],
-    "Archives": [".zip", ".rar", ".7z"]
-}
+[![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
+[![Tkinter](https://img.shields.io/badge/GUI-Tkinter-green.svg)](https://docs.python.org/3/library/tkinter.html)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Release](https://img.shields.io/badge/Télécharger-latest%20release-blue)](https://github.com/cbdu34/appclean/releases/latest)
 
-# Fichiers et dossiers à NE JAMAIS toucher
-FICHIERS_A_IGNORER = ["env.py", Path(__file__).name] 
-DOSSIERS_INTERDITS = ["AppData", "Windows", "Program Files", "Program Files (x86)", ".git", "OneDrive"]
+> Petit utilitaire de bureau qui range automatiquement les fichiers d'un ou plusieurs dossiers dans des sous-dossiers par catégorie (Images, Vidéos, Documents, Archives…).
 
-def nettoyer_dossiers_vides(chemin_parent):
-    for root, dirs, files in os.walk(chemin_parent, topdown=False):
-        for name in dirs:
-            dossier_complet = os.path.join(root, name)
-            if name not in CLASSEMENT.keys() and name != "Autres_Fichiers":
-                try:
-                    if not os.listdir(dossier_complet): 
-                        os.rmdir(dossier_complet)
-                except:
-                    pass
+Interface graphique Tkinter, aucune dépendance externe, fonctionne sous Windows, Linux et macOS.
 
-def ranger_fichiers_recursif(dossier_parent):
-    compteur = 0
-    bloques = []
-    p_parent = Path(dossier_parent)
-    
-    for fichier in list(p_parent.rglob("*")):
-        try:
-            # SÉCURITÉ 1 : Ignorer les dossiers système/cloud
-            if any(interdit in fichier.parts for interdit in DOSSIERS_INTERDITS):
-                continue
-            
-            # SÉCURITÉ 2 : Ignorer le fichier de code (env.py)
-            if fichier.name in FICHIERS_A_IGNORER:
-                continue
+---
 
-            if fichier.is_file():
-                if any(cat in fichier.parts for cat in CLASSEMENT.keys()) or "Autres_Fichiers" in fichier.parts:
-                    continue
-                    
-                extension = fichier.suffix.lower()
-                nom_categorie = "Autres_Fichiers"
-                
-                for categorie, extensions in CLASSEMENT.items():
-                    if extension in extensions:
-                        nom_categorie = categorie
-                        break
-                
-                dest_dir = fichier.parent / nom_categorie
-                dest_dir.mkdir(exist_ok=True)
-                
-                cible = dest_dir / fichier.name
-                if cible.exists():
-                    cible = dest_dir / f"nouveau_{fichier.name}"
-                
-                shutil.move(str(fichier), str(cible))
-                compteur += 1
-        except PermissionError:
-            bloques.append(fichier.name)
-        except Exception:
-            continue
-                
-    return compteur, bloques
+## ✨ Fonctionnalités
 
-# --- INTERFACE ---
-def ajouter_dossier():
-    dossier = filedialog.askdirectory()
-    if dossier and dossier not in liste_widget.get(0, tk.END):
-        liste_widget.insert(tk.END, dossier)
+- 📂 **Rangement récursif** : analyse les sous-dossiers et trie les fichiers par extension.
+- 🗂️ **8 catégories** : Images, Scripts Python, Documents LibreOffice, PDF/Textes, Vidéos, Musique, Archives et Autres.
+- 🧹 **Nettoyage** : supprime les dossiers devenus vides après le tri.
+- 🛡️ **Garde-fous** : ignore les dossiers système (`Windows`, `Program Files`, `AppData`, `.git`, `OneDrive`) et le fichier du programme lui-même.
+- 🔁 **Doublons** : renomme automatiquement en `nouveau_<fichier>` si un fichier du même nom existe déjà.
+- 🖥️ **Multi-dossiers** : ajoutez plusieurs dossiers à traiter en une seule fois.
 
-def supprimer_selection():
-    for i in reversed(liste_widget.curselection()):
-        liste_widget.delete(i)
+---
 
-def lancer_rangement():
-    dossiers = liste_widget.get(0, tk.END)
-    if not dossiers:
-        messagebox.showwarning("Attention", "Veuillez ajouter un dossier.")
-        return
-    
-    total_ok = 0
-    tous_bloques = []
-    
-    for d in dossiers:
-        ok, err = ranger_fichiers_recursif(d)
-        total_ok += ok
-        tous_bloques.extend(err)
-        nettoyer_dossiers_vides(d)
-    
-    bilan = f"Opération terminée !\n\n✅ {total_ok} fichiers rangés.\n⚠️ {len(tous_bloques)} fichiers ignorés (occupés)."
-    messagebox.showinfo("Bilan", bilan)
+## 🚀 Utilisation
 
-root = tk.Tk()
-root.title("Organiseur de Bureau Pro")
-root.geometry("500x520")
+### Option 1 : depuis le code source
 
-# --- ASTUCE ICÔNE ---
-# Pour mettre une icône : trouvez un fichier .ico et utilisez :
-# root.iconbitmap("mon_icone.ico")
-# En attendant, on utilise une icône système Windows par défaut :
-try:
-    root.wm_iconbitmap(default=None) # Remplacez None par le chemin d'un .ico si vous en avez un
-except:
-    pass
+```bash
+git clone https://github.com/cbdu34/appclean.git
+cd appclean
+python appclean.py
+```
 
-tk.Label(root, text="Dossiers à organiser :", font=("Segoe UI", 11, "bold")).pack(pady=15)
+Prérequis : Python 3.9+ avec Tkinter (inclus par défaut sous Windows/macOS ; sous Linux : `sudo apt install python3-tk`).
 
-liste_widget = tk.Listbox(root, selectmode=tk.MULTIPLE, width=60, height=12, font=("Segoe UI", 9))
-liste_widget.pack(padx=20, pady=5)
+### Option 2 : exécutable Windows
 
-cadre = tk.Frame(root)
-cadre.pack(pady=10)
+Téléchargez `clean.exe` depuis la page [Releases](https://github.com/cbdu34/appclean/releases/latest).
 
-tk.Button(cadre, text=" ➕ Ajouter ", command=ajouter_dossier, width=12).pack(side=tk.LEFT, padx=5)
-tk.Button(cadre, text=" ➖ Retirer ", command=supprimer_selection, width=12).pack(side=tk.LEFT, padx=5)
+---
 
-btn_go = tk.Button(root, text="LANCER LE RANGEMENT", bg="#0078D4", fg="white", 
-                   font=("Segoe UI", 12, "bold"), relief="flat", command=lancer_rangement)
-btn_go.pack(pady=25, ipady=12, fill=tk.X, padx=50)
+## 🛠️ Reconstruction de l'exécutable
 
-root.mainloop()
+```bash
+pip install pyinstaller
+pyinstaller --onefile --windowed appclean.py
+```
+
+Le binaire est généré dans `dist/`.
+
+---
+
+## 📁 Catégories de rangement
+
+| Dossier | Extensions |
+| --- | --- |
+| `Images` | jpg, jpeg, png, gif, bmp, svg, webp |
+| `Scripts_Python` | py, pyw, ipynb |
+| `LibreOffice_Docs` | odt, ott, sxw, ods, odp |
+| `PDF_et_Textes` | pdf, txt, doc, docx |
+| `Videos` | mp4, mov, avi, mkv |
+| `Musique` | mp3, wav, flac |
+| `Archives` | zip, rar, 7z |
+| `Autres_Fichiers` | tout le reste |
+
+> ⚠️ L'outil **déplace** les fichiers, il ne les supprime pas. Faites tout de même une sauvegarde avant le premier passage sur un dossier important.
+
+---
+
+## 📄 Licence
+
+Distribué sous licence MIT. Voir le fichier [LICENSE](LICENSE).

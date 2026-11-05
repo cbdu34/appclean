@@ -1,21 +1,14 @@
-# Security Policy
+# Politique de sécurité
 
-## Supported Versions
+## Versions supportées
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+Seule la dernière version publiée (branche `main` et dernière *Release*) reçoit des correctifs de sécurité.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+## Signaler une vulnérabilité
 
-## Reporting a Vulnerability
+Merci de **ne pas ouvrir d'issue publique** pour un problème de sécurité.
 
-Use this section to tell people how to report a vulnerability.
+Utilisez l'onglet **Security → Report a vulnerability** du dépôt GitHub :
+https://github.com/cbdu34/appclean/security/advisories/new
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Je ferai de mon mieux pour accuser réception et corriger le problème rapidement.
